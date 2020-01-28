@@ -50,6 +50,7 @@ class Layout extends Component {
           </button>
         </form>
         <Content value={this.state.value}></Content>
+        {this.state.apiResponse}
       </div>
     );
   }
