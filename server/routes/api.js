@@ -3,14 +3,24 @@ var router = express.Router();
 const axios = require("axios");
 
 router.get("/items", async (req, res) => {
+
   try{
     const response = await axios.get(`https://api.mercadolibre.com/sites/MLA/search?q=${req.query.q}`)
+
+     const categories_id = response.data.results.map(e =>{
+      return e.category_id
+    });
+    
+    const filtro_categories = categories_id.filter((e, index, arr) =>{
+      return arr.indexOf(e) === index;
+    });
+    
     res.json({
       author: {
         name: "Pame",
         lastname: "Torres Lujan"
       },
-      categories: [],
+      categories: filtro_categories,
       items: response.data.results.map(element => {
         return {
           id: element.id,
