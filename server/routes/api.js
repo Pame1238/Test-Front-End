@@ -17,10 +17,7 @@ router.get("/items", async (req, res) => {
           title: element.title,
           price: {
             currency: element.currency_id,
-            amount: Math.trunc(element.installments.amount),
-            decimals:
-                    element.installments.amount -
-                    Math.trunc(element.installments.amount)
+            amount: element.price
           },
           picture: element.thumbnail,
           condition: element.condition,
@@ -37,8 +34,37 @@ router.get("/items", async (req, res) => {
   }
 });
 
-router.get("/test", function(req, res, next) {
-  res.send('respond with a resource');
-});
+router.get("/items/:id", async (req, res) =>{
+  try{
+    const response = await axios.get(`https://api.mercadolibre.com/items/${req.params.id}`)
+    const description = await axios.get(`https://api.mercadolibre.com/items/${req.params.id}/descriptions`)
+    res.json({
+        author: {
+        name: "Pame",
+        lastname: "Torres Lujan"
+      },
+      item: {
+        id: response.data.id,
+        title: response.data.title,
+        price: {
+          currency: response.data.currency_id,
+          amount: response.data.price
+        },
+        picture: response.data.thumbnail,
+        condition: response.data.condition,
+        free_shipping: response.data.shipping.free_shipping,
+        sold_quantity: response.data.sold_quantity,
+        description: description.data[0].plain_text
+
+      }
+    })
+  }catch(error){
+    if (error.response) {
+      res
+        .status(error.response.status)
+        .json({ error: error.response.data.message });
+    }
+  }
+}); 
 
 module.exports = router;
